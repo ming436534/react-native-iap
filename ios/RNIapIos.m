@@ -202,12 +202,16 @@ RCT_EXPORT_METHOD(finishTransaction) {
   currentTransaction = nil;
 }
 
-RCT_EXPORT_METHOD(clearTransaction) {
+RCT_EXPORT_METHOD(clearTransaction:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSArray *pendingTrans = [[SKPaymentQueue defaultQueue] transactions];
+  NSMutableArray* output = [[NSMutableArray alloc] init];
   NSLog(@"\n\n\n  ***  clear remaining Transactions. Call this before make a new transaction   \n\n.");
   for (int k = 0; k < pendingTrans.count; k++) {
-    [[SKPaymentQueue defaultQueue] finishTransaction:pendingTrans[k]];
+    SKPaymentTransaction* t = pendingTrans[k];
+    [output addObject:[self getPurchaseData:t]];
+    [[SKPaymentQueue defaultQueue] finishTransaction:t];
   }
+  resolve(output);
 }
 
 RCT_EXPORT_METHOD(clearProducts) {
