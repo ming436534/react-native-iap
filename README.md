@@ -19,6 +19,8 @@
   - Please refer to [Blog](https://medium.com/@dooboolab/react-native-in-app-purchase-121622d26b67).
 
 ## Migration Guide
+For `ios` under version 12, it is compatible until `react-nativep-iap` version `2.4.8`. From `2.4.9`, it will support `ios` >= 12.
+
 `2.0.0-alpha1` has released. Not much difference. There were some parameters supports and changes to distinguish the differences in platform at one sight. Please follow the readme what you get in returned variables when calling `getItems` and when purchasing through `buyProduct` or `buySubscription`.
 
 Difference between `0.3.*` and `1.0.0` has only one method renaming `refreshItems` to `consumeAllItems`.
@@ -66,10 +68,10 @@ Also, note that this is our last migration for renaming method names without any
 | Func  | Param  | Return | Description |
 | :------------ |:---------------:| :---------------:| :-----|
 | ~~prepare~~ |  | `Promise<void>` | Deprecated. Use `initConnection` instead. |
-| initConnection |  | `Promise<string>` | Init IAP module. On Android this can be called to preload the connection to Play Services. In iOS, it will simply call `canMakePayments` method and return value.|
+| initConnection |  | `Promise<boolean>` | Init IAP module. On Android this can be called to preload the connection to Play Services. In iOS, it will simply call `canMakePayments` method and return value.|
 | getProducts | `string[]` Product IDs/skus | `Promise<Product[]>` | Get a list of products (consumable and non-consumable items, but not subscriptions). Note: On iOS versions earlier than 11.2 this method _will_ also return subscriptions if they are included in your list of SKUs. This is because we cannot differentiate between IAP products and subscriptions prior to 11.2. |
 | getSubscriptions | `string[]` Subscription IDs/skus | `Promise<Subscription[]>` | Get a list of subscriptions. Note: On iOS versions earlier than 11.2 this method _will_ also return products if they are included in your list of SKUs. This is because we cannot differentiate between IAP products and subscriptions prior to 11.2. |
-| getPurchaseHistory | | `Promise<Purchase[]>` | Gets an invetory of purchases made by the user regardless of consumption status (where possible) |
+| getPurchaseHistory | | `Promise<Purchase[]>` | Gets an inventory of purchases made by the user regardless of consumption status (where possible) |
 | getAvailablePurchases | | `Promise<Purchase[]>` | Get all purchases made by the user (either non-consumable, or haven't been consumed yet)
 | buySubscription | `string` Subscription ID/sku, `string` Old Subscription ID/sku (on Android), `int` Proration Mode (on Android) | `Promise<Purchase>` | Create (buy) a subscription to a sku. For upgrading/downgrading subscription on Android pass the second parameter with current subscription ID, on iOS this is handled automatically by store. You can also optionally pass in a proration mode integer for upgrading/downgrading subscriptions on Android |
 | buyProduct | `string` Product ID/sku | `Promise<Purchase>` | Buy a product |
@@ -96,16 +98,6 @@ https://github.com/dooboolab/react-native-iap
 
 ### Mostly automatic installation
 `$ react-native link react-native-iap`
-
-**Note for Ejected iOS Apps:**
-
-The above command will add the following to your `Podfile`:
-
-```ruby
-pod 'RNIap', :path => '../node_modules/react-native-iap'
-```
-
-You should remove this before running `pod install` and follow the manual installation instructions below.
 
 ### Manual installation
 
@@ -197,7 +189,7 @@ componentWillUnmount() {
 Once you have called `getProducts()`, and you have a valid response, you can call `buyProduct()`. Subscribable products can be purchased just like consumable products and users can cancel subscriptions by using the iOS System Settings.
 
 ```javascript
-  try
+  try {
     // Will return a purchase object with a receipt which can be used to validate on your server.
     const purchase = await RNIap.buyProduct('com.example.coins100');
     this.setState({
@@ -345,6 +337,9 @@ We've like to update this solution as version changes in `react-native-iap`.
 - Offical doc is [here](https://developer.android.com/google/play/billing/billing_library_overview).
 - I've developed this feature for other developers to contribute easily who are aware of these things. The doc says you can also get the `accessToken` via play console without any of your backend server. You can get this by following process.
   * Select your app > Services & APIs > "YOUR LICENSE KEY FOR THIS APPLICATION Base64-encoded RSA public key to include in your binary". [reference](https://stackoverflow.com/questions/27132443/how-to-find-my-google-play-services-android-base64-public-key).
+  
+#### How to make consumable product in android developer mode?
+- If you are facing `"You already own this item"` on developer(test) mode you might check [related issue #126](https://github.com/dooboolab/react-native-iap/issues/126#issuecomment-439084872)
 
 #### How do I use react-native-iap in expo?
 - You should detach from `expo` and get `expokit` out of it.

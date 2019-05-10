@@ -29,12 +29,9 @@ matrix:
 
     install:
       - npm install
-      - cd RNIapExample
+      - cd IapExample
       - npm install
       - cd ..
 
     script:
       - npm run lint
-      - cd RNIapExample
-      - npm run lint
-      - cd ..
