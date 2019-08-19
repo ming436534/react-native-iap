@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import java.lang.NullPointerException;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -432,20 +432,21 @@ public class RNIapModule extends ReactContextBaseJavaModule {
         rejectPromisesWithBillingError(PROMISE_BUY_ITEM, responseCode);
         return;
       }
-
-      Purchase purchase = purchases.get(0);
-
-      WritableMap item = Arguments.createMap();
-      item.putString("productId", purchase.getSku());
-      item.putString("transactionId", purchase.getOrderId());
-      item.putString("transactionDate", String.valueOf(purchase.getPurchaseTime()));
-      item.putString("transactionReceipt", purchase.getOriginalJson());
-      item.putString("purchaseToken", purchase.getPurchaseToken());
-      item.putString("dataAndroid", purchase.getOriginalJson());
-      item.putString("signatureAndroid", purchase.getSignature());
-      item.putBoolean("autoRenewingAndroid", purchase.isAutoRenewing());
-
-      resolvePromisesForKey(PROMISE_BUY_ITEM, item);
+      if (purchases != null) {
+        Purchase purchase = purchases.get(0);
+        if (purchase != null) {
+          WritableMap item = Arguments.createMap();
+          item.putString("productId", purchase.getSku());
+          item.putString("transactionId", purchase.getOrderId());
+          item.putString("transactionDate", String.valueOf(purchase.getPurchaseTime()));
+          item.putString("transactionReceipt", purchase.getOriginalJson());
+          item.putString("purchaseToken", purchase.getPurchaseToken());
+          item.putString("dataAndroid", purchase.getOriginalJson());
+          item.putString("signatureAndroid", purchase.getSignature());
+          item.putBoolean("autoRenewingAndroid", purchase.isAutoRenewing());
+          resolvePromisesForKey(PROMISE_BUY_ITEM, item);
+        }
+      }
     }
   };
 
